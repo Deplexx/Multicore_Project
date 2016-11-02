@@ -18,10 +18,10 @@ public class TwitterAccess {
 	public TwitterAccess(){
 		ConfigurationBuilder cb = new ConfigurationBuilder();
 		cb.setDebugEnabled(true)
-		  .setOAuthConsumerKey("BupgxpMGWJVGZbFCbRTxh8gc2")
-		  .setOAuthConsumerSecret("KNvLqYhnU16sr16iqv6XrR8utD4hSwYtdT9EwTjDJCjCoEV2pe")
-		  .setOAuthAccessToken("2779499479-kaQXGJHK4hx45SoapkueKEe4N3PshZeERcJmj5n")
-		  .setOAuthAccessTokenSecret("l7EL6TCk1cJ1zdGf4DzzK41v0rR2HLZBfT7raR3AfIa8m");
+		  .setOAuthConsumerKey("")
+		  .setOAuthConsumerSecret("")
+		  .setOAuthAccessToken("")
+		  .setOAuthAccessTokenSecret("");
 		this.twitter = new TwitterFactory(cb.build()).getInstance();
 		current_status = null;
 	}
