@@ -3,12 +3,12 @@ package wordcloud;
 import java.util.StringTokenizer;
 import java.util.concurrent.ConcurrentMap;
 
-public class WordCountParallel implements Runnable {
+public class WCConcHashParallel implements Runnable {
     private final String buffer;
     private final ConcurrentMap<String,Integer> counts;
     private final static String DELIMS = " :;,.{}()\t\n";
 
-    public WordCountParallel(String buffer, 
+    public WCConcHashParallel(String buffer, 
                              ConcurrentMap<String,Integer> counts) {
         this.counts = counts;
         this.buffer = buffer;
