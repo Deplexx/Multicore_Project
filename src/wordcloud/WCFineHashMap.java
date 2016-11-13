@@ -46,13 +46,21 @@ public class WCFineHashMap implements WordCount {
     	return wf;
     }
     
-    public void printWordCount(){
+    public int printWordCount(){
         int total = 0;
+        //int ctr = 0;
     	for (Map.Entry<String,FineSet> entry : this.map.entrySet()) {
             int count = entry.getValue().value;
             //System.out.format("%-30s %d\n",entry.getKey(),count);
             total += count;
+            //ctr += 1;
         }
         System.out.println("Fine Hash Map Total words: " + total);
+        return total;
+    }
+
+    @Override
+    public String toString(){
+    	return "Fine";
     }
 }

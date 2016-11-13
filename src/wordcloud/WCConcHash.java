@@ -44,7 +44,7 @@ public class WCConcHash implements WordCount {
     	return wf;
     }
     
-    public void printWordCount(){
+    public int printWordCount(){
         int total = 0;
     	for (Map.Entry<String,Integer> entry : this.map.entrySet()) {
             int count = entry.getValue();
@@ -52,5 +52,11 @@ public class WCConcHash implements WordCount {
             total += count;
         }
         System.out.println("Conc Hash Map Total words: " + total);
+        return total;
+    }
+
+    @Override
+    public String toString(){
+    	return "Conc";
     }
 }
