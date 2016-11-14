@@ -10,12 +10,12 @@ public class WCCuckooHashParallel implements Runnable {
     private final String buffer;
     private final CuckooHashMap map;
     private final static String DELIMS = " :;,.{}()\t\n";
-    ReentrantLock lock;
+    public static ReentrantLock lock = new ReentrantLock();
 
     public WCCuckooHashParallel(String buffer, CuckooHashMap map) {
         this.buffer = buffer;
         this.map = map;
-        lock = new ReentrantLock();
+//        lock = new ReentrantLock();
     }
 
     /**
@@ -29,7 +29,9 @@ public class WCCuckooHashParallel implements Runnable {
             lock.unlock();
         } else {
             int count = (Integer)map.get(q);
+//            System.out.println("count of word is " + count);
             count += 1;
+            map.remove(q);
             map.put(q, count);
             lock.unlock();
         }

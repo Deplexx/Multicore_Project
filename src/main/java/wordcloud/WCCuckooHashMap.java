@@ -4,9 +4,7 @@ import com.kennycason.kumo.WordFrequency;
 
 import java.io.IOException;
 import java.util.*;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 
 /**
  * Cuckoo Hash Map
@@ -271,6 +269,27 @@ class CuckooHashMap<K, V> extends AbstractMap<K, V> implements
 		Object k = maskNull(key);
 
 		if (containsKey(k)) {
+			int hash = hash(hash1, k);
+			Object k2;
+			Entry<K, V> e = table[hash];
+			if (e != null && ((k2 = e.key) == k || k.equals(k2))) {
+				e.value = value;
+				return e.value;
+			}
+
+			hash = hash(hash2, k);
+			e = table[hash];
+			if (e != null && ((k2 = e.key) == k || k.equals(k2))) {
+				e.value = value;
+				return e.value;
+			}
+
+
+
+//
+//			System.out.println("@@@@@@@@@@@@@@ SHOULD NOT REACH HERE");
+//			int index = hash(hash1, key);
+//			Entry<K, V> e = table[hash]
 			return null;
 		}
 
@@ -312,21 +331,56 @@ class CuckooHashMap<K, V> extends AbstractMap<K, V> implements
 }
 
 class CuckooHash implements WordCount {
-	private CuckooHashMap map;
+	private CuckooHashMap<String, Integer> map;
 
+	public CuckooHash(){
+		this.map = new CuckooHashMap<String, Integer>();
+	}
 
 	public void storeWordCount(List<String> strList, int numThreads) throws IOException {
+//		System.out.println("words are " + strList);
 		ExecutorService pool = Executors.newFixedThreadPool(numThreads);
+//		for (String str : strList) {
+//			pool.submit(new WCCuckooHashParallel(str, map));
+//		}
+//
+//		pool.shutdown();
+//		try {
+//			pool.awaitTermination(1, TimeUnit.DAYS);
+//		} catch (InterruptedException e) {
+//			System.out.println("Pool interrupted!");
+//			System.exit(1);
+//		}
+
+
+
+
+
+
+
+		List<Future<?>> flist = new ArrayList<Future<?>>();
+
 		for (String str : strList) {
-			pool.submit(new WCCuckooHashParallel(str, map));
+			Future<?> f = pool.submit(new WCCuckooHashParallel(str,this.map));
+			flist.add(f);
 		}
 
 		pool.shutdown();
 		try {
-			pool.awaitTermination(1, TimeUnit.DAYS);
+			pool.awaitTermination(1,TimeUnit.DAYS);
 		} catch (InterruptedException e) {
 			System.out.println("Pool interrupted!");
 			System.exit(1);
+		}
+
+		for (Future<?> f : flist) {
+			try {
+				f.get();
+			} catch (ExecutionException ex) {
+				ex.getCause().printStackTrace();
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
 		}
 	}
 
@@ -341,10 +395,27 @@ class CuckooHash implements WordCount {
 
 	public int printWordCount() {
 		int total = 0;
+		System.out.println("Key set size is : " + map.keySet().size());
 		for(Object key : map.keySet()) {
 			total += (Integer)map.get(key);
 		}
 		System.out.println("Cuckoo Hash Map Total words: " + total);
 		return total;
+
+
+//		int total = 0;
+//		for (Map.Entry<String,Integer> entry : this.map.entrySet()) {
+//			int count = entry.getValue().value;
+//			//System.out.format("%-30s %d\n",entry.getKey(),count);
+//			total += count;
+//			//ctr += 1;
+//		}
+//		System.out.println("Fine Hash Map Total words: " + total);
+//		return total;
+	}
+
+	@Override
+	public String toString() {
+		return "Cuckoo";
 	}
 }
