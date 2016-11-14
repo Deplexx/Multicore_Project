@@ -112,6 +112,7 @@ public class WordCloudDriver {
 		wcList.add(new WCQuadHashMap());
 		wcList.add(new WCLFChainHash(2048));
 		wcList.add(new WCLFChainHash(32));
+		wcList.add(new WCHopscotch(4));
 		List<WordFrequency> wordFrequencies = iterate_wordcount(wcList, messages);
 	
 		if(DRAW_KUMO) {

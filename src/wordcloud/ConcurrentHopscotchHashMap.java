@@ -31,6 +31,10 @@
 
 package wordcloud;
 
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 import java.util.concurrent.locks.ReentrantLock;
 
 public class ConcurrentHopscotchHashMap<K, V> {
@@ -158,6 +162,7 @@ public class ConcurrentHopscotchHashMap<K, V> {
                     is_need_init = false;
                     start_timestamp = _timestamp;
                     iBucket = hash & _bucketk_mask;
+                    System.out.println("iBucket: " + iBucket + " _table_hash_delta: " + _table_hash_delta.length);
                     data = _table_hash_delta[iBucket];
                     final int first_delta = (short) data;
                     if(0 != first_delta) {
@@ -702,4 +707,51 @@ public class ConcurrentHopscotchHashMap<K, V> {
 
     //general
     public void clear() {}
+    
+    //replace
+    public boolean replace(final K key, V oldVal, V newVal) {
+		if (this.containsKey(key) && Objects.equals(this.get(key), oldVal)) {
+		  this.put(key, newVal);
+		  return true;
+		} else
+		  return false;
+    }
+    
+    private class HopscotchEntry implements Map.Entry<K, V> {
+    	private K _key;
+    	private V _val;
+    	
+    	public HopscotchEntry(V val) {
+    		_val = val;
+    	}
+    	
+		@Override
+		public K getKey() {
+			return _key;
+		}
+
+		@Override
+		public V getValue() {
+			return _val;
+		}
+
+		@Override
+		public V setValue(V value) {
+			// TODO Auto-generated method stub
+			return null;
+		}
+    	
+    }
+    
+    //entrySet()
+    @SuppressWarnings("unchecked")
+	public Set<Map.Entry<K,V>> entrySet() {
+    	Set<Map.Entry<K,V>> ret = new HashSet<Map.Entry<K,V>>();
+    	
+    	for(int i = 0; i < this._segments.length; ++i)
+    		for(int j = 0; j < _segments[i]._count; ++j)
+    			ret.add(new HopscotchEntry((V) _segments[i]._table_key_value[j]));
+    	
+    	return ret;
+    }
 }
