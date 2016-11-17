@@ -2,10 +2,12 @@ package wordcloud;
 
 import java.util.StringTokenizer;
 
+/**
+ * Runnable for the Lock Free Chain Hash Table implementation of WordCount.
+ */
 public class WCLFChainParallel implements Runnable{
 	private final String buffer;
     private final ChainHashTable counts;
-    private final static String DELIMS = " :;,.{}()\t\n";
 
     public WCLFChainParallel(String buffer, 
                              ChainHashTable counts) {
@@ -14,29 +16,33 @@ public class WCLFChainParallel implements Runnable{
     }    
 
     /**
-     * Updates the count for each number of words.  Uses optimistic
-     * techniques to make sure count is updated properly.
+     * Checks to see if the value exists, in which case insert it atomically.
+     * Then, increment atomically.
      */
     private void updateCount(String q) {
-    	FineSet cnt;
+    	if(!StringCleaner.checkValid(q))
+    		return;
         if (!counts.contains(q)) {
     		if(counts.get(q) == null){ // ensure noone has it initialized
-        		FineSet newSet = new FineSet();
+        		//FineSet newSet = new FineSet();
         		// Keep trying to insert if insert fails.
-        		while(!counts.insert(q, newSet));
+        		while(!counts.insert(q, 0));
     		}
 
         }
         //System.out.println("Insert Successful");
-        cnt = counts.get(q);
-        if(cnt == null)
+        int cnt = counts.get(q).get();
+        if(cnt == -1)
         	System.out.println("Cnt is null");
         
-        cnt.increment();
+        while(counts.get(q).incrementAndGet() == cnt);
     } 
 
+    /**
+     * Tokenize and pass to {@link #updateCount(String)}
+     */
     public void run() {
-        StringTokenizer st = new StringTokenizer(buffer,DELIMS);
+        StringTokenizer st = new StringTokenizer(buffer,StringCleaner.DELIMS);
         //System.out.println("Buffer " + buffer);
         while (st.hasMoreTokens()) {
             String token = st.nextToken().toUpperCase();

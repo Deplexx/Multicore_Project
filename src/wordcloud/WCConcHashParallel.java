@@ -3,10 +3,14 @@ package wordcloud;
 import java.util.StringTokenizer;
 import java.util.concurrent.ConcurrentMap;
 
+/**
+ * Runnable for the Concurrent Hash Map for WordCount. Goes through the String
+ * provided and updates the ConcurrentMap passed in.
+ *
+ */
 public class WCConcHashParallel implements Runnable {
     private final String buffer;
     private final ConcurrentMap<String,Integer> counts;
-    private final static String DELIMS = " :;,.{}()\t\n";
 
     public WCConcHashParallel(String buffer, 
                              ConcurrentMap<String,Integer> counts) {
@@ -19,26 +23,14 @@ public class WCConcHashParallel implements Runnable {
      * techniques to make sure count is updated properly.
      */
     private void updateCount(String q) {
+    	if(!StringCleaner.checkValid(q))
+    		return;
         Integer oldVal, newVal;
         Integer cnt = counts.get(q);
-        // first case: there was nothing in the table yet
         if (cnt == null) {
-            // attempt to put 1 in the table.  If the old
-            // value was null, then we are OK.  If not, then
-            // some other thread put a value into the table
-            // instead, so we fall through
             oldVal = counts.put(q, 1);
             if (oldVal == null) return;
         }
-        // general case: there was something in the table
-        // already, so we have increment that old value
-        // and attempt to put the result in the table.
-        // To make sure that we do this atomically,
-        // we use concurrenthashmap's replace() method
-        // that takes both the old and new value, and will
-        // only replace the value if the old one currently
-        // there is the same as the one passed in.
-        // Cf. http://www.javamex.com/tutorials/synchronization_concurrency_8_hashmap2.shtml 
         do {
             oldVal = counts.get(q);
             newVal = (oldVal == null) ? 1 : (oldVal + 1);
@@ -46,13 +38,12 @@ public class WCConcHashParallel implements Runnable {
     } 
 
     /**
-     * Main task : tokenizes the given buffer and counts words. 
+     * Tokenizes the string stored using the delimiter and 
      */
     public void run() {
-        StringTokenizer st = new StringTokenizer(buffer,DELIMS);
+        StringTokenizer st = new StringTokenizer(buffer,StringCleaner.DELIMS);
         while (st.hasMoreTokens()) {
             String token = st.nextToken().toUpperCase();
-            //System.out.println("updating count for "+token);
             updateCount(token);
         }
     } 

@@ -1,17 +1,20 @@
 package wordcloud;
 
-import java.util.concurrent.locks.ReentrantLock;
-
+/**
+ * Simple fine set solution for the word frequency. The hash map can contain a key and this object to synchronously increment.
+ */
 public class FineSet {
-	ReentrantLock lock;
 	int value;
+	/**
+	 * Initialize to 0.
+	 */
 	public FineSet () {
-		this.lock = new ReentrantLock();
 		this.value = 0;
 	}
-	public void increment(){
-		this.lock.lock();
+	/**
+	 * Increment value by 1 synchronously.
+	 */
+	public synchronized void increment(){
 		this.value++;
-		this.lock.unlock();
 	}
 }

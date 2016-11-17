@@ -9,7 +9,6 @@ import java.util.concurrent.*;
 /**
  * Cuckoo Hash Map
  * 
- * Implementation of Map interface using Cuckoo Hashing.
  * Using two hash functions instead of single hash function to determine the
  * possible location of an entry in the map. An entry is allocated in one of the
  * two possible location of for the key, kicking out any previous entry from the
@@ -18,11 +17,6 @@ import java.util.concurrent.*;
  * This process may result in an infinite loop, in which case, the underlying
  * data structure is re-hashed and all the keys from the old data structure is
  * re-mapped to their preferred locations in the new data structure.
- * 
- * In this simplified implementation, we take a array data structure, each key
- * value pair represented by an Entry<K, V>. Two hash functions hash1 and hash2
- * are used to determine index position to insert an entry to table.
- * 
  */
 
 class CuckooHashMap<K, V> extends AbstractMap<K, V> implements
@@ -33,23 +27,9 @@ class CuckooHashMap<K, V> extends AbstractMap<K, V> implements
 	static final float DEFAULT_LOAD_FACTOR = 0.75f;
 	private int currentCapacity;
 
-	/* Test main */
-	public static void main(String[] args) {
-		Map<Integer, String> map = new CuckooHashMap<Integer, String>();
-		int itemCount = 25;
-		for (int i = 0; i < itemCount; i++) {
-			Integer key = i;
-			String val = "Value_" + i;
-			map.put(key, val);
-		}
-
-		System.out.println(map.get(1));
-
-		for (String v : map.values()) {
-			System.out.println(v);
-		}
-	}
-	
+	/**
+	 * Used to generate two hash functions, h1 and h2
+	 */
 	static class DefaultHashFunction<T> implements HashFunction<T> {
 		private static final Random ENGINE = new Random();
 		private int rounds;
@@ -73,6 +53,9 @@ class CuckooHashMap<K, V> extends AbstractMap<K, V> implements
 		}
 	}
 
+	/**
+	 * Each key value pair represented by an Entry<K, V>
+	 */
 	static class Entry<K, V> implements Map.Entry<K, V> {
 		final K key;
 		V value;
@@ -206,7 +189,6 @@ class CuckooHashMap<K, V> extends AbstractMap<K, V> implements
 
 
 	public synchronized V get(Object key) {
-		//
 		int hash = hash(hash1, key);
 		Entry<K, V> e = table[hash];
 		if (e != null && e.key.equals(key)) {
@@ -228,6 +210,12 @@ class CuckooHashMap<K, V> extends AbstractMap<K, V> implements
 	private void init() {
 	}
 
+	/**
+	 * To add a new entry, check if it fits into index determined by h1
+	 * If it doesn't, find index determined by h2
+	 * If there is an element there, kick it out and put the element in
+	 * The kicked-out element will go through the same process
+     */
 	private boolean insertEntry(Entry<K, V> e) {
 		int count = 0;
 		Entry<K, V> current = e;
@@ -252,25 +240,6 @@ class CuckooHashMap<K, V> extends AbstractMap<K, V> implements
 
 		return false;
 	}
-/**
-	private boolean insertEntry(Entry<K, V> e) {
-		int count = 0;
-		Entry<K, V>[] newTable = new Entry[currentCapacity];
-
-		for (K key : this.keySet()){
-			if(key != null){
-				Entry<K,V> epee = new Entry<K,V> (key, get(key));
-				insertEntry(epee, newTable);
-			}
-		}
-		if(!insertEntry(e, newTable)) {
-			return false;
-		}
-
-		table = newTable;
-		return true;
-	}
-**/
 	public boolean isEmpty() {
 		return size == 0;
 	}
@@ -292,27 +261,6 @@ class CuckooHashMap<K, V> extends AbstractMap<K, V> implements
 
 	private synchronized V put(K key, V value, boolean isRehash) {
 		if (contains(key)) {
-//			int hash = hash(hash1, k);
-//			Object k2;
-//			Entry<K, V> e = table[hash];
-//			if (e != null && ((k2 = e.key) == k || k.equals(k2))) {
-//				e.value = value;
-//				return e.value;
-//			}
-//
-//			hash = hash(hash2, k);
-//			e = table[hash];
-//			if (e != null && ((k2 = e.key) == k || k.equals(k2))) {
-//				e.value = value;
-//				return e.value;
-//			}
-
-
-
-//
-//			System.out.println("@@@@@@@@@@@@@@ SHOULD NOT REACH HERE");
-//			int index = hash(hash1, key);
-//			Entry<K, V> e = table[hash]
 			return get(key);
 		}
 
@@ -329,7 +277,7 @@ class CuckooHashMap<K, V> extends AbstractMap<K, V> implements
 	}
 
 	private void rehash(int newCapacity) {
-		System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@@@");
+		System.out.println("Resized");
 		Entry<K, V>[] oldTable = table;
 		int oldCapacity = oldTable.length;
 		if (oldCapacity >= MAXIMUM_CAPACITY) {
@@ -361,29 +309,13 @@ class CuckooHash implements WordCount {
 		this.map = new CuckooHashMap<String, FineSet>();
 	}
 
+
+	/**
+	 * Pass in a list of strings and the number of threads to execute to display the time taken
+     */
 	public void storeWordCount(List<String> strList, int numThreads) throws IOException {
-//		System.out.println("words are " + strList);
 		ExecutorService pool = Executors.newFixedThreadPool(numThreads);
-//		for (String str : strList) {
-//			pool.submit(new WCCuckooHashParallel(str, map));
-//		}
-//
-//		pool.shutdown();
-//		try {
-//			pool.awaitTermination(1, TimeUnit.DAYS);
-//		} catch (InterruptedException e) {
-//			System.out.println("Pool interrupted!");
-//			System.exit(1);
-//		}
-
-
-
-
-
-
-
 		List<Future<?>> flist = new ArrayList<Future<?>>();
-
 		for (String str : strList) {
 			Future<?> f = pool.submit(new WCCuckooHashParallel(str,this.map));
 			flist.add(f);
@@ -417,28 +349,21 @@ class CuckooHash implements WordCount {
 		return wf;
 	}
 
+	/**
+	 * Iterate through all the keys and count the number of words
+	 * Used for debugging purposes only
+	 */
 	public int printWordCount() {
 		int total = 0;
 		System.out.println("Key set size is : " + map.keySet().size());
 		for(Object key : map.keySet()) {
 			FineSet f  = map.get(key);
 			if(f != null) {
-				total += f.value;//f.value;
+				total += f.value;
 			}
 		}
 		System.out.println("Cuckoo Hash Map Total words: " + total);
 		return total;
-
-
-//		int total = 0;
-//		for (Map.Entry<String,Integer> entry : this.map.entrySet()) {
-//			int count = entry.getValue().value;
-//			//System.out.format("%-30s %d\n",entry.getKey(),count);
-//			total += count;
-//			//ctr += 1;
-//		}
-//		System.out.println("Fine Hash Map Total words: " + total);
-//		return total;
 	}
 
 	@Override

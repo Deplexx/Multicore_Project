@@ -12,9 +12,21 @@ import twitter4j.conf.ConfigurationBuilder;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Simplified version of Twitter Access from twitter4j API.
+ * 
+ * Provides the means to look up a user timeline or query twitter given a string. This object will allow
+ * user the store the result within itself. User can call the different output methods to return in the
+ * desired format. 
+ */
 public class TwitterAccess {
 	Twitter twitter;
 	List<Status> current_status;
+	
+	/**
+	 * Initializes twitter access given the consumer/access token/secret from Twitter Application Developer
+	 * website which allows this program access to twitter API.
+	 */
 	public TwitterAccess(){
 		ConfigurationBuilder cb = new ConfigurationBuilder();
 		cb.setDebugEnabled(true)
@@ -26,25 +38,39 @@ public class TwitterAccess {
 		current_status = null;
 	}
 	
-	/*
-	 * Stores 20 of the user's most recent tweets.
+	/**
+	 * Store 20 most recent tweets from the given username. 
+	 * 
+	 * WARNING: Twitter discards old tweets.
+	 * 
+	 * @param username - name to lookup in twitter
+	 * @throws TwitterException 
 	 */
 	public void storeUserTimeline (String username) throws TwitterException {
 		this.current_status = this.twitter.getUserTimeline(username);
 	}
 	
-	/*
-	 * Stores up to num of user tweets (May be a lot less depending on Twitter capacity).
+	/**
+	 * Stores num most recent tweets from the given username.
+	 * 
+	 * WARNING: Twitter discards old tweets. If num > tweets available, will only store max given.
+	 * 
+	 * @param username - name to lookup in twitter
+	 * @param num - number of tweets to look for.
+	 * @throws TwitterException
 	 */
 	public void storeUserTimeline (String username, int num) throws TwitterException {
 		this.current_status = this.twitter.getUserTimeline(username, new Paging(1,num));
 	}
 	
-	/*
+	/**
 	 * Stores numberOfTweets amount of tweets corresponding to the keyword. Keyword is anything
 	 * that can be written into search to find tweets in Twitter.com 
+	 * 
+	 * @param keyword - Keyword to search twitter with
+	 * @param numberOfTweets - number of tweets to query
 	 */
-	public void storeQuery (String keyword, int numberOfTweets) {
+	public void storeQuery (String keyword, int numberOfTweets) throws TwitterException {
 	    Query query = new Query(keyword);
 	    long lastID = Long.MAX_VALUE;
 	    this.current_status = new ArrayList<Status>();
@@ -53,7 +79,6 @@ public class TwitterAccess {
 	        query.setCount(100);
 	      else 
 	        query.setCount(numberOfTweets - this.current_status.size());
-	      try {
 	        QueryResult result = twitter.search(query);
 	        /*for (Status status : result.getTweets() ) {
 	        	if( status.getText().startsWith("RT") ){
@@ -64,17 +89,11 @@ public class TwitterAccess {
 	        for (Status t: this.current_status) 
 	          if(t.getId() < lastID) 
 	              lastID = t.getId();
-
-	      }
-
-	      catch (TwitterException te) {
-	        System.out.println("Couldn't connect: " + te);
-	      }; 
 	      query.setMaxId(lastID-1);
 	    }
 	}
 	
-	/*
+	/**
 	 * Gets the user screen name from the first list. Only useful is storing usertimeline.
 	 */
 	public String getUserScreenName(){
@@ -84,7 +103,7 @@ public class TwitterAccess {
 		return current_status.get(0).getUser().getScreenName();
 	}
 	
-	/*
+	/**
 	 * Returns a list of all users from statuses. Useful for stored queries.
 	 */
 	public List<String> getAllUsers(){
@@ -95,7 +114,7 @@ public class TwitterAccess {
 		return result;
 	}
 	
-	/*
+	/**
 	 * Returns a string of all the tweets.
 	 */
 	public List<String> getStoredStrings(){
@@ -106,7 +125,7 @@ public class TwitterAccess {
 		return result;
 	}
 	
-	/*
+	/**
 	 * Returns a list of stored statuses. Statuses store a lot of info which will need to be
 	 * retracted.
 	 */
