@@ -68,7 +68,6 @@ public class ConcurrentHopscotchHashMap<K, V> {
         void lock() {
             while(!_lock.compareAndSet(0, 0xFFFF)) { }
         }
-
         void unlock() {
             _lock.set(0);
         }
@@ -694,17 +693,14 @@ public class ConcurrentHopscotchHashMap<K, V> {
     		_val = val;
     	}
     	
-		@Override
 		public K getKey() {
 			return _key;
 		}
 
-		@Override
 		public V getValue() {
 			return _val;
 		}
 
-		@Override
 		public V setValue(V value) {
 			// TODO Auto-generated method stub
 			return null;

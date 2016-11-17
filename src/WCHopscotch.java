@@ -57,7 +57,7 @@ public class WCHopscotch implements WordCount {
     }
     
     public int printWordCount(){
-    	System.out.println(map.size());
+    	//System.out.println(map.size());
     	return 20;
 //        int total = 0;
 //    	for (Map.Entry<String,Integer> entry : this.map.entrySet()) {
