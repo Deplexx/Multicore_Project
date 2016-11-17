@@ -11,9 +11,19 @@ import java.util.concurrent.TimeUnit;
 
 import com.kennycason.kumo.WordFrequency;
 
+/**
+ * WCHopscotch calculates the frequency of words in a document using a concurrent hashmap that utilizes
+ * the Hopscotch hashing algorithm.
+ */
 public class WCHopscotch implements WordCount {
     public ConcurrentHopscotchHashMap<String,Integer> map;
     
+    /**
+	 * WCHopscotch implements WordCount and concurrently calculates the frequencies of words in a document.
+	 * 	
+	 * @param concLvl - The number of segments in the hashmap. 
+	 * @throws java.io.IOException
+	 */
     public WCHopscotch(int concLvl) {
         this.map = new ConcurrentHopscotchHashMap<String,Integer>(1000, concLvl);
     }
