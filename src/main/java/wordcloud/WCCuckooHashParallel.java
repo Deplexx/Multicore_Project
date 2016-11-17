@@ -1,6 +1,7 @@
 package wordcloud;
 
 import java.util.StringTokenizer;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
@@ -23,15 +24,23 @@ public class WCCuckooHashParallel implements Runnable {
      */
     private void updateCount(String q) {
 //        lock.lock();
+        boolean noPut = true;
         FineSet fineSet = (FineSet)map.get(q);
 
         if(fineSet == null){ // ensure noone has it initialized
+            noPut = false;
             fineSet = new FineSet();
-            map.put(q, fineSet);
-            fineSet = (FineSet)map.get(q);
+            fineSet = (FineSet) map.put(q, fineSet);
+//            fineSet = (FineSet)map.get(q);
 //            lock.unlock();
         }
-        fineSet.increment();
+
+        try {
+            fineSet.increment();
+        } catch(Exception e) {
+            updateCount(q);
+//            System.out.println("noPut: " + noPut);
+        }
 //            map.put(q, fineSet);
 //            lock.unlock();
     }

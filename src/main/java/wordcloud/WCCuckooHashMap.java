@@ -28,9 +28,10 @@ import java.util.concurrent.*;
 class CuckooHashMap<K, V> extends AbstractMap<K, V> implements
 		Map<K, V> {
 
-	static final int DEFAULT_INITIAL_CAPACITY = 5000;
+	static final int DEFAULT_INITIAL_CAPACITY = 50000;
 	static final int MAXIMUM_CAPACITY = 1 << 30;
 	static final float DEFAULT_LOAD_FACTOR = 0.75f;
+	private int currentCapacity;
 
 	/* Test main */
 	public static void main(String[] args) {
@@ -150,6 +151,7 @@ class CuckooHashMap<K, V> extends AbstractMap<K, V> implements
 		this.loadFactor = DEFAULT_LOAD_FACTOR;
 		threshold = (int) (DEFAULT_INITIAL_CAPACITY * DEFAULT_LOAD_FACTOR);
 		table = new Entry[DEFAULT_INITIAL_CAPACITY];
+		currentCapacity = DEFAULT_INITIAL_CAPACITY;
 		hash1 = new DefaultHashFunction<K>(2);
 		hash2 = new DefaultHashFunction<K>(3);
 		init();
@@ -202,22 +204,19 @@ class CuckooHashMap<K, V> extends AbstractMap<K, V> implements
 		return es;
 	}
 
-	public V get(Object key) {
-		Object k = maskNull(key);
 
-		int hash = hash(hash1, k);
-		Object k2;
+	public synchronized V get(Object key) {
+		int hash = hash(hash1, key);
 		Entry<K, V> e = table[hash];
-		if (e != null && ((k2 = e.key) == k || k.equals(k2))) {
+		if (e != null && e.key.equals(key)) {
 			return e.value;
 		}
 
-		hash = hash(hash2, k);
+		hash = hash(hash2, key);
 		e = table[hash];
-		if (e != null && ((k2 = e.key) == k || k.equals(k2))) {
+		if (e != null && e.key.equals(key)) {
 			return e.value;
 		}
-
 		return null;
 	}
 
@@ -252,7 +251,25 @@ class CuckooHashMap<K, V> extends AbstractMap<K, V> implements
 
 		return false;
 	}
+/**
+	private boolean insertEntry(Entry<K, V> e) {
+		int count = 0;
+		Entry<K, V>[] newTable = new Entry[currentCapacity];
 
+		for (K key : this.keySet()){
+			if(key != null){
+				Entry<K,V> epee = new Entry<K,V> (key, get(key));
+				insertEntry(epee, newTable);
+			}
+		}
+		if(!insertEntry(e, newTable)) {
+			return false;
+		}
+
+		table = newTable;
+		return true;
+	}
+**/
 	public boolean isEmpty() {
 		return size == 0;
 	}
@@ -265,10 +282,15 @@ class CuckooHashMap<K, V> extends AbstractMap<K, V> implements
 		return put(key, value, false);
 	}
 
-	private V put(K key, V value, boolean isRehash) {
-		Object k = maskNull(key);
+	/**
+	 * Don't need to use AbstractMap's containsKey, because Cuckoo hashing ensures its at one of two locations
+	 */
+	private boolean contains(K key) {
+		return get(key) != null;
+	}
 
-		if (containsKey(k)) {
+	private synchronized V put(K key, V value, boolean isRehash) {
+		if (contains(key)) {
 //			int hash = hash(hash1, k);
 //			Object k2;
 //			Entry<K, V> e = table[hash];
@@ -290,22 +312,23 @@ class CuckooHashMap<K, V> extends AbstractMap<K, V> implements
 //			System.out.println("@@@@@@@@@@@@@@ SHOULD NOT REACH HERE");
 //			int index = hash(hash1, key);
 //			Entry<K, V> e = table[hash]
-			return null;
+			return get(key);
 		}
 
-		if (insertEntry(new Entry<K, V>((K) k, value))) {
+		if (insertEntry(new Entry<K, V>((K) key, value))) {
 			if (!isRehash) {
 				size++;
 			}
 
-			return null;
+			return get(key);
 		}
 
 		rehash(2 * table.length);
-		return put((K) k, value);
+		return put((K) key, value);
 	}
 
 	private void rehash(int newCapacity) {
+		System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@@@");
 		Entry<K, V>[] oldTable = table;
 		int oldCapacity = oldTable.length;
 		if (oldCapacity >= MAXIMUM_CAPACITY) {
@@ -320,7 +343,7 @@ class CuckooHashMap<K, V> extends AbstractMap<K, V> implements
 				put(e.key, e.value, true);
 			}
 		}
-
+		currentCapacity = newCapacity;
 		threshold = (int) (newCapacity * loadFactor);
 	}
 
@@ -397,7 +420,10 @@ class CuckooHash implements WordCount {
 		int total = 0;
 		System.out.println("Key set size is : " + map.keySet().size());
 		for(Object key : map.keySet()) {
-			total += map.get(key).value;
+			FineSet f  = map.get(key);
+			if(f != null) {
+				total += f.value;//f.value;
+			}
 		}
 		System.out.println("Cuckoo Hash Map Total words: " + total);
 		return total;
