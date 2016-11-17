@@ -1,34 +1,3 @@
-////////////////////////////////////////////////////////////////////////////////
-// ConcurrentHopscotchHashMap Class
-//
-////////////////////////////////////////////////////////////////////////////////
-//TERMS OF USAGE
-//----------------------------------------------------------------------
-//
-//  Permission to use, copy, modify and distribute this software and
-//  its documentation for any purpose is hereby granted without fee,
-//  provided that due acknowledgments to the authors are provided and
-//  this permission notice appears in all copies of the software.
-//  The software is provided "as is". There is no warranty of any kind.
-//
-//Authors:
-//  Maurice Herlihy
-//  Brown University
-//  and
-//  Nir Shavit
-//  Tel-Aviv University
-//  and
-//  Moran Tzafrir
-//  Tel-Aviv University
-//
-//  Date: Dec 2, 2008.
-//
-////////////////////////////////////////////////////////////////////////////////
-// Programmer : Moran Tzafrir (MoranTza@gmail.com)
-//
-////////////////////////////////////////////////////////////////////////////////
-//package xbird.util.concurrent.map;
-
 package wordcloud;
 
 import java.util.HashSet;
