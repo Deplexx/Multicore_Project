@@ -122,7 +122,7 @@ class QuadHashTable
     			result.add(new QuadHashEntry(keys[i], vals[i]));
     		}
     	}
-    	//System.out.println("Found " + result.size() + "Different Words. Should be: " + ctr);
+    	System.out.println("Found " + result.size() + "Different Words. Should be: " );//+ ctr);
     	return result;
     }
 }

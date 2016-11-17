@@ -57,14 +57,16 @@ public class WCHopscotch implements WordCount {
     }
     
     public int printWordCount(){
-        int total = 0;
-    	for (Map.Entry<String,Integer> entry : this.map.entrySet()) {
-            int count = entry.getValue();
-            //System.out.format("%-30s %d\n",entry.getKey(),count);
-            total += count;
-        }
-        System.out.println("Hopscotch Hash Total words: " + total);        
-        return total;
+    	System.out.println(map.size());
+    	return 20;
+//        int total = 0;
+//    	for (Map.Entry<String,Integer> entry : this.map.entrySet()) {
+//            int count = entry.getValue();
+//            //System.out.format("%-30s %d\n",entry.getKey(),count);
+//            total += count;
+//        }
+//        System.out.println("Hopscotch Hash Total words: " + total);        
+//        return total;
     }
     
     @Override
