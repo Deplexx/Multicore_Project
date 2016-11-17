@@ -11,10 +11,18 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import com.kennycason.kumo.WordFrequency;
 
+/**
+ * Fine Hash Map implementation of HashMap as a comparison for java's Concurrent Hash
+ * Map algorithm. The fine part is done by using FineSet and insert control through
+ * WCFineHashParallel
+ */
 public class WCFineHashMap implements WordCount {
 	public HashMap<String, FineSet> map;
 	ReentrantLock lock;
 	
+	/**
+	 * Initialize WordCount with empty HashMap and a new lock to be used for insert control
+	 */
 	public WCFineHashMap () {
 		map = new HashMap<String, FineSet>();
 		this.lock = new ReentrantLock();

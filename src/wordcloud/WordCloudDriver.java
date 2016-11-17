@@ -5,7 +5,8 @@ import java.awt.Dimension;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicReference;
+
+import twitter4j.TwitterException;
 
 import com.kennycason.kumo.CollisionMode;
 import com.kennycason.kumo.WordCloud;
@@ -16,16 +17,24 @@ import com.kennycason.kumo.font.scale.SqrtFontScalar;
 import com.kennycason.kumo.palette.ColorPalette;
 import com.kennycason.kumo.palette.LinearGradientColorPalette;
 
-
+/**
+ * This class is written to drive the program containing the main method and any methods that will aid. 
+ * 
+ * At the top, we allow the different inputs to the program. SHOW_TOTAL is used as a debugging method to ensure that all graph algorithms output
+ * the same number of total word frequencies found. DRAW_KUMO is the ultimate result of the program so that the user can output a word cloud.
+ * If they would rather see the comparison between the different types of hash algorithms, user can set this to false and set SHOW_GRAPH to true.
+ * 
+ * At the bottom of the inputs, we allow specific details of the program.
+ */
 public class WordCloudDriver {
 	/** Driver logistics **/
-	public static boolean SHOW_TOTAL = true;
+	public static boolean SHOW_TOTAL = false;
 	public static boolean DRAW_KUMO = false;
 	public static boolean SHOW_GRAPH = true;
 	
 	/** Input/Output **/
 	public static int NUM_THREADS = 4;
-	public static int NUM_TWEETS = 100;
+	public static int NUM_TWEETS = 400;
 	public static String TWITTER_SEARCH = "obama";
 	public static String INPUT_IMAGE = "obama.png";
 	public static String OUTPUT_IMAGE = "obama.png";
@@ -94,10 +103,12 @@ public class WordCloudDriver {
 	 * 
 	 * @param args - UNUSED
 	 * @throws IOException
+	 * @throws TwitterException 
 	 */
-	public static void main (String args[]) throws IOException {
+	public static void main (String args[]) throws IOException, TwitterException {
 		long start;
 		List<String> messages;
+		StringCleaner.initInvalidStrings();
 		TwitterAccess ta = new TwitterAccess();
 		
 		start = System.currentTimeMillis();
@@ -109,9 +120,11 @@ public class WordCloudDriver {
 		List<WordCount> wcList = new ArrayList<WordCount>();
 		wcList.add(new WCConcHash());
 		wcList.add(new WCFineHashMap());
-		wcList.add(new WCQuadHashMap());
-		wcList.add(new WCLFChainHash(2048));
+		wcList.add(new WCQuadHashMap(32));
+		wcList.add(new WCQuadHashMap(4096));
 		wcList.add(new WCLFChainHash(32));
+		wcList.add(new WCLFChainHash(2048));
+		wcList.add(new CuckooHash());
 		wcList.add(new WCHopscotch(4));
 		List<WordFrequency> wordFrequencies = iterate_wordcount(wcList, messages);
 	

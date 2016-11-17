@@ -11,9 +11,16 @@ import java.util.concurrent.TimeUnit;
 
 import com.kennycason.kumo.WordFrequency;
 
+/**
+ * Extension of the WordCount using Java's Concurrent Hash Map
+ *
+ */
 public class WCConcHash implements WordCount {
     public ConcurrentMap<String,Integer> map;
     
+    /**
+     * Initialize the Conc Hash.
+     */
     public WCConcHash (){
         this.map = new ConcurrentHashMap<String,Integer>();
     }
