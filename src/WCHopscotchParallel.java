@@ -2,6 +2,10 @@ package wordcloud;
 
 import java.util.StringTokenizer;
 
+/**
+ * WCHopscotchParallel is a per-thread routine that feeds tokens into a concurrent hash map.
+ * The hash map utilizes the hopscotch hashing algorithm.
+ */
 public class WCHopscotchParallel implements Runnable {
     private final String buffer;
     private final ConcurrentHopscotchHashMap<String,Integer> counts;
