@@ -162,7 +162,7 @@ public class ConcurrentHopscotchHashMap<K, V> {
                     is_need_init = false;
                     start_timestamp = _timestamp;
                     iBucket = hash & _bucketk_mask;
-                    System.out.println("iBucket: " + iBucket + " _table_hash_delta: " + _table_hash_delta.length);
+                    //System.out.println("iBucket: " + iBucket + " _table_hash_delta: " + _table_hash_delta.length);
                     data = _table_hash_delta[iBucket];
                     final int first_delta = (short) data;
                     if(0 != first_delta) {
@@ -749,7 +749,7 @@ public class ConcurrentHopscotchHashMap<K, V> {
     	Set<Map.Entry<K,V>> ret = new HashSet<Map.Entry<K,V>>();
     	
     	for(int i = 0; i < this._segments.length; ++i)
-    		for(int j = 0; j < _segments[i]._count; ++j)
+    		for(int j = 1; j < _segments[i]._count; j += 2)
     			ret.add(new HopscotchEntry((V) _segments[i]._table_key_value[j]));
     	
     	return ret;
