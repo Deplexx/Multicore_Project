@@ -25,7 +25,7 @@ public class WordCloudDriver {
 	
 	/** Input/Output **/
 	public static int NUM_THREADS = 4;
-	public static int NUM_TWEETS = 400;
+	public static int NUM_TWEETS = 100;
 	public static String TWITTER_SEARCH = "obama";
 	public static String INPUT_IMAGE = "obama.png";
 	public static String OUTPUT_IMAGE = "obama.png";
