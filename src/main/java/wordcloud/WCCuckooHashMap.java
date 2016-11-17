@@ -206,6 +206,7 @@ class CuckooHashMap<K, V> extends AbstractMap<K, V> implements
 
 
 	public synchronized V get(Object key) {
+		//
 		int hash = hash(hash1, key);
 		Entry<K, V> e = table[hash];
 		if (e != null && e.key.equals(key)) {

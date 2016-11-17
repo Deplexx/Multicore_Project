@@ -26,7 +26,7 @@ public class WCCuckooHashParallel implements Runnable {
 //        lock.lock();
         boolean noPut = true;
         FineSet fineSet = (FineSet)map.get(q);
-
+//
         if(fineSet == null){ // ensure noone has it initialized
             noPut = false;
             fineSet = new FineSet();
