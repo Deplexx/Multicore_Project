@@ -8,7 +8,7 @@ By:
 - Nico Cortes
 
 ## Features
-Current supports the follwing Hash Algorithms:
+Currently supports the following Hash Algorithms:
 
 1. Java's Concurrent Hash Map - Java's implementation of Concurrent Hash Map Algorithm
 2. Fine Hash Map - Fine hash map with fine get, coarse insert/resize. Uses base Java HashMap to implement.
